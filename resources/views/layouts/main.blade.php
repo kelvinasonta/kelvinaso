@@ -65,6 +65,7 @@
 </head>
 
 <body>
+    <x-preloader />
     <main class="container">
         <x-nav-component />
         {{ $slot }}

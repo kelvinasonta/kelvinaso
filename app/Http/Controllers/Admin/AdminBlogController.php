@@ -79,7 +79,7 @@ class AdminBlogController extends Controller
 
         $isPublished = isset($validated['status']) ? in_array($validated['status'], ['published', '1', 'true'], true) : true;
 
-        $post = Post::create([
+        Post::create([
             'title' => $validated['title'],
             'slug' => $slug,
             'excerpt' => $validated['excerpt'] ?? '',

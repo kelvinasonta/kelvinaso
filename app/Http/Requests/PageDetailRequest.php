@@ -25,8 +25,8 @@ class PageDetailRequest extends FormRequest
         return [
             'title' => 'required|string',
             'slug' => 'required|string',
-            'meta_description' => 'required|string',
-            'meta_keywords' => 'required|string',
+            'meta_description' => 'nullable|string',
+            'meta_keywords' => 'nullable|string',
             'sections' => 'nullable|array',
             'sections.*.id' => 'nullable|integer|exists:page_sections,id',
             'sections.*.section_name' => 'nullable|string',

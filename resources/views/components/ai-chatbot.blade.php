@@ -3,14 +3,14 @@
 @endphp
 
 @if ($enabled === '1')
-    <div id="aiChatbotContainer" style="position: fixed; bottom: 24px; right: 24px; z-index: 9999; font-family: var(--font-sans);">
+    <div id="aiChatbotContainer" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999; font-family: var(--font-sans);">
         <!-- Toggle Button -->
-        <button type="button" id="btnToggleChatbot" onclick="toggleChatbotWindow()" style="width: 54px; height: 54px; border-radius: 50%; background: var(--accent); color: #fff; border: none; box-shadow: var(--glow), 0 8px 24px rgba(0,0,0,0.25); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.2s ease;">
+        <button type="button" id="btnToggleChatbot" onclick="toggleChatbotWindow()" aria-label="Open AI Assistant" style="width: 52px; height: 52px; border-radius: 50%; background: var(--accent); color: #fff; border: none; box-shadow: var(--glow), 0 8px 24px rgba(0,0,0,0.25); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.2s ease;">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
         </button>
 
         <!-- Chat Window -->
-        <div id="chatbotWindow" style="display: none; position: absolute; bottom: 70px; right: 0; width: 370px; height: 500px; background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); flex-direction: column; overflow: hidden;">
+        <div id="chatbotWindow" style="display: none; position: absolute; bottom: 64px; right: 0; width: min(380px, calc(100vw - 32px)); height: min(520px, calc(100dvh - 100px)); background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); flex-direction: column; overflow: hidden;">
             <!-- Header -->
             <div style="background: var(--accent); color: #fff; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center;">
                 <div style="display: flex; align-items: center; gap: 8px;">

@@ -21,7 +21,7 @@ class AdminAiLeadController extends Controller
         return view('admin.ai_leads', compact('page', 'profile', 'conversations'));
     }
 
-    public function show($id)
+    public function show(int $id)
     {
         $page = Page::all();
         $profile = Auth::user()->profile;

@@ -62,26 +62,18 @@ class AdminSettingController extends Controller
 
         // Handle Site Logo Upload
         if ($request->hasFile('site_logo')) {
-            $file = $request->file('site_logo');
-            $filename = 'logo_' . time() . '.' . $file->getClientOriginalExtension();
-            $destinationPath = public_path('uploads/settings');
-            if (!file_exists($destinationPath)) {
-                mkdir($destinationPath, 0755, true);
-            }
-            $file->move($destinationPath, $filename);
-            $validated['site_logo'] = 'uploads/settings/' . $filename;
+            $validated['site_logo'] = app(\App\Services\ImageUploadService::class)->upload(
+                $request->file('site_logo'),
+                'settings'
+            );
         }
 
         // Handle Site Favicon Upload
         if ($request->hasFile('site_favicon')) {
-            $file = $request->file('site_favicon');
-            $filename = 'favicon_' . time() . '.' . $file->getClientOriginalExtension();
-            $destinationPath = public_path('uploads/settings');
-            if (!file_exists($destinationPath)) {
-                mkdir($destinationPath, 0755, true);
-            }
-            $file->move($destinationPath, $filename);
-            $validated['site_favicon'] = 'uploads/settings/' . $filename;
+            $validated['site_favicon'] = app(\App\Services\ImageUploadService::class)->upload(
+                $request->file('site_favicon'),
+                'settings'
+            );
         }
 
         // Save each setting to settings database table

@@ -1,13 +1,14 @@
 <x-main-layout :page="$page">
-    <div style="max-width: 900px; margin: 40px auto 80px;">
-        <div style="text-align: center; margin-bottom: 48px;">
-            <h1 style="font-size: 2.5rem; font-weight: 700; margin-bottom: 12px;">Code Snippets & Architecture Notes</h1>
-            <p style="color: var(--muted); font-size: 1.1rem; max-width: 600px; margin: 0 auto;">
-                A collection of developer tricks, architectural patterns, and reusable code solutions.
+    <div style="max-width: 960px; margin: 2rem auto 5rem; padding: 0 1rem;">
+        <div style="text-align: center; margin-bottom: 3rem;">
+            <p class="eyebrow">Developer Knowledge Base</p>
+            <h1 style="font-size: clamp(2rem, 5vw, 3rem); font-weight: 700; margin: 0.75rem 0 1rem;">Code Snippets & Architecture Notes</h1>
+            <p style="color: var(--muted); font-size: 1.1rem; max-width: 600px; margin: 0 auto; line-height: 1.6;">
+                A collection of developer recipes, architectural patterns, and production-ready code utilities.
             </p>
         </div>
 
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 24px;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); gap: 1.5rem;">
             @forelse ($snippets as $snip)
                 <div style="background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.2s ease, border-color 0.2s ease;">
                     <div>

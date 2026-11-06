@@ -15,14 +15,23 @@ class ImageUploadService
         'image/png',
         'image/webp',
         'image/jpg',
-        'image/heic',
-        'image/heif',
         'image/gif',
         'image/svg+xml',
     ];
 
-    protected int $maxFileSize = 35 * 1024 * 1024; // 35MB
+    /**
+     * Max dimension (width or height) to resize down to for optimal size reduction.
+     */
+    protected int $maxDimension = 1920;
 
+    /**
+     * Default WebP compression quality (80 yields huge reduction with virtually no visible loss).
+     */
+    protected int $webpQuality = 80;
+
+    /**
+     * Upload an image, convert it to WebP format, reduce its dimension and file size, and store it.
+     */
     public function upload(
         UploadedFile $file,
         string $directory = 'images',
@@ -39,23 +48,32 @@ class ImageUploadService
             mkdir($targetPath, 0755, true);
         }
 
-        if ($useMagick && class_exists('\Imagick')) {
-            $image = $this->createImage($file);
-            $filename = Str::uuid().'.webp';
-            $fullFilePath = $targetPath.'/'.$filename;
-            $relativePath = $uploadSubDir.'/'.$filename;
+        $mime = $this->detectMimeType($file);
 
-            $this->processAndStore($image, $fullFilePath);
-
-            $image->clear();
-            $image->destroy();
-
-            return $relativePath;
+        // SVGs are vector XML and should be stored intact with sanitized extension
+        if ($mime === 'image/svg+xml') {
+            $filename = time().'_'.Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)).'.svg';
+            $file->move($targetPath, $filename);
+            return $uploadSubDir.'/'.$filename;
         }
 
-        // Standard upload directly to public/uploads/...
-        $filename = time().'_'.Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)).'.'.$file->getClientOriginalExtension();
-        $file->move($targetPath, $filename);
+        // Generate .webp filename
+        $baseName = Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
+        if (empty($baseName)) {
+            $baseName = 'img';
+        }
+        $filename = time().'_'.$baseName.'.webp';
+        $destinationFile = $targetPath.'/'.$filename;
+
+        // Convert to WebP and compress
+        $converted = $this->convertAndCompressToWebp($file->getRealPath(), $destinationFile, $mime);
+
+        if (! $converted) {
+            // Fallback: move file directly if GD fails
+            $fallbackExt = $file->getClientOriginalExtension() ?: 'png';
+            $filename = time().'_'.$baseName.'.'.$fallbackExt;
+            $file->move($targetPath, $filename);
+        }
 
         return $uploadSubDir.'/'.$filename;
     }
@@ -101,6 +119,123 @@ class ImageUploadService
         }
     }
 
+    /**
+     * Converts any raster image (JPEG, PNG, GIF, WebP) to WebP format,
+     * downsizes dimensions if larger than maxDimension, and applies optimal quality.
+     */
+    protected function convertAndCompressToWebp(string $sourcePath, string $destinationPath, string $mime): bool
+    {
+        if (! function_exists('imagewebp')) {
+            return false;
+        }
+
+        $image = null;
+
+        switch ($mime) {
+            case 'image/jpeg':
+            case 'image/jpg':
+                if (function_exists('imagecreatefromjpeg')) {
+                    $image = @imagecreatefromjpeg($sourcePath);
+                }
+                break;
+
+            case 'image/png':
+                if (function_exists('imagecreatefrompng')) {
+                    $image = @imagecreatefrompng($sourcePath);
+                }
+                break;
+
+            case 'image/webp':
+                if (function_exists('imagecreatefromwebp')) {
+                    $image = @imagecreatefromwebp($sourcePath);
+                }
+                break;
+
+            case 'image/gif':
+                if (function_exists('imagecreatefromgif')) {
+                    $image = @imagecreatefromgif($sourcePath);
+                }
+                break;
+
+            default:
+                if (function_exists('imagecreatefromstring')) {
+                    $contents = @file_get_contents($sourcePath);
+                    if ($contents) {
+                        $image = @imagecreatefromstring($contents);
+                    }
+                }
+                break;
+        }
+
+        if (! $image) {
+            return false;
+        }
+
+        $width = imagesx($image);
+        $height = imagesy($image);
+
+        // Auto-orient JPEG if EXIF is available
+        if (function_exists('exif_read_data') && ($mime === 'image/jpeg' || $mime === 'image/jpg')) {
+            $exif = @exif_read_data($sourcePath);
+            if (! empty($exif['Orientation'])) {
+                switch ($exif['Orientation']) {
+                    case 3:
+                        $image = imagerotate($image, 180, 0);
+                        break;
+                    case 6:
+                        $image = imagerotate($image, -90, 0);
+                        $width = imagesx($image);
+                        $height = imagesy($image);
+                        break;
+                    case 8:
+                        $image = imagerotate($image, 90, 0);
+                        $width = imagesx($image);
+                        $height = imagesy($image);
+                        break;
+                }
+            }
+        }
+
+        // Calculate proportional downscaled dimensions
+        $targetWidth = $width;
+        $targetHeight = $height;
+
+        if ($width > $this->maxDimension || $height > $this->maxDimension) {
+            if ($width >= $height) {
+                $targetWidth = $this->maxDimension;
+                $targetHeight = (int) round(($height / $width) * $this->maxDimension);
+            } else {
+                $targetHeight = $this->maxDimension;
+                $targetWidth = (int) round(($width / $height) * $this->maxDimension);
+            }
+        }
+
+        // Create new truecolor canvas
+        $canvas = imagecreatetruecolor($targetWidth, $targetHeight);
+
+        // Preserve alpha transparency for PNG / WebP / GIF
+        imagealphablending($canvas, false);
+        imagesavealpha($canvas, true);
+        $transparent = imagecolorallocatealpha($canvas, 0, 0, 0, 127);
+        imagefilledrectangle($canvas, 0, 0, $targetWidth, $targetHeight, $transparent);
+
+        // Resample with antialiasing / bicubic interpolation
+        imagecopyresampled(
+            $canvas,
+            $image,
+            0, 0, 0, 0,
+            $targetWidth,
+            $targetHeight,
+            $width,
+            $height
+        );
+
+        // Save as WebP with optimized quality
+        $result = imagewebp($canvas, $destinationPath, $this->webpQuality);
+
+        return $result && file_exists($destinationPath) && filesize($destinationPath) > 0;
+    }
+
     protected function validateFile(UploadedFile $file): void
     {
         if (! $file->isValid()) {
@@ -131,69 +266,5 @@ class ImageUploadService
         }
 
         return $mime;
-    }
-
-    protected function createImage(UploadedFile $file): object
-    {
-        if (! class_exists('\Imagick')) {
-            throw ValidationException::withMessages([
-                'image' => 'Imagick extension is not installed on this server.',
-            ]);
-        }
-
-        try {
-            $imagickClass = '\Imagick';
-            $image = new $imagickClass;
-
-            $image->readImage($file->getRealPath());
-
-            if ($image->getNumberImages() !== 1) {
-                $image->clear();
-                $image->destroy();
-
-                throw ValidationException::withMessages([
-                    'image' => 'Animated or multi-image files are not allowed.',
-                ]);
-            }
-
-            $image->setIteratorIndex(0);
-
-            return $image;
-        } catch (\Exception $e) {
-            throw ValidationException::withMessages([
-                'image' => 'The image could not be processed via Imagick.',
-            ]);
-        }
-    }
-
-    protected function processAndStore(
-        object $image,
-        string $fullFilePath
-    ): void {
-        try {
-            // Remove EXIF and other metadata.
-            $image->stripImage();
-
-            // Flatten certain image formats against a transparent background.
-            if ($image->getImageAlphaChannel()) {
-                $imagickClass = '\Imagick';
-                $image->setImageAlphaChannel($imagickClass::ALPHACHANNEL_ACTIVATE);
-            }
-
-            // Re-encode instead of storing the original file.
-            $image->setImageFormat('webp');
-
-            $image->setImageCompressionQuality(85);
-
-            $image->setOption('webp:method', '6');
-
-            $contents = $image->getImageBlob();
-
-            file_put_contents($fullFilePath, $contents);
-        } catch (\Exception $e) {
-            throw ValidationException::withMessages([
-                'image' => 'The image could not be processed via Imagick.',
-            ]);
-        }
     }
 }

@@ -14,7 +14,8 @@ class Stack extends Model
         'type',
         'level',
         'is_lang',
-        'is_active'
+        'is_active',
+        'user_id'
     ];
 
     public function user()

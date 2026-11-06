@@ -85,7 +85,7 @@ class AiChatbotController extends Controller
                     'role' => $headline,
                     'bio' => $bio,
                     'location' => $profile->location ?? 'Remote / Global',
-                    'email' => $profile->direct_email ?? 'contact@keviloq.com',
+                    'email' => $profile->direct_email ?? 'contact@Portfolio.com',
                 ],
                 'services' => [
                     'Custom SaaS & Web Application Development (Laravel, Vue, React)',

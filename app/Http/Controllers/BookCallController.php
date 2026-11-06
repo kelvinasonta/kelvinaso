@@ -15,7 +15,7 @@ class BookCallController extends Controller
             return redirect()->route('home');
         }
 
-        $page = Page::where('slug', 'home')->first();
+        $page = Page::where('slug', 'book-call')->first() ?? Page::where('slug', 'home')->first();
         $calendlyUrl = setting('calendly_url', 'https://calendly.com');
 
         return view('book_call', compact('page', 'calendlyUrl'));

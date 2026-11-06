@@ -12,7 +12,7 @@ class GitHubService
         return Cache::remember('github_repos_' . $username, 3600, function () use ($username) {
             try {
                 $response = Http::withHeaders([
-                    'User-Agent' => 'Keviloq-Portfolio-App',
+                    'User-Agent' => 'Portfolio-Portfolio-App',
                 ])->timeout(10)->get("https://api.github.com/users/{$username}/repos?sort=updated&per_page=6");
 
                 if ($response->successful()) {

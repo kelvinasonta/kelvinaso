@@ -5,7 +5,7 @@
 @endphp
 
 
-<x-main-layout :page="$page" :settings="$settings ?? ['site_name' => 'Portfolio']">
+<x-main-layout :page="$page">
     <section class="hero" style="position: relative;">
 
         <x-profile-card-component :profile="$profile" />
@@ -13,14 +13,14 @@
         <div style="position: relative; z-index: 1;">
             <div class="card hero-card animate-up delay-2">
                 <p class="muted" style="font-size:0.875rem;">Hello there! <span style="color:var(--accent);">👋</span></p>
-                <h1 style="margin-top:1.0rem;">{{ $profileCard->content['hero_title'] }}
-                    {{ ucwords($profile->first_name . ' ' . $profile->last_name) }},
-                    {{ $profileCard->content['hero_title_two'] }} <span
-                        class="text-gradient">{{ $profileCard->content['hero_title_highlight'] }}</span>
-                    {{ $profileCard->content['hero_title_suffix'] }}</h1>
-                <div class="hero-meta"><span class="dot-live"></span> {{ $profileCard->content['hero_meta'] }}</div>
+                <h1 style="margin-top:1.0rem;">{{ $profileCard->content['hero_title'] ?? "I'm" }}
+                    {{ ucwords(($profile?->first_name ?? 'Kelvin') . ' ' . ($profile?->last_name ?? 'Aso')) }},
+                    {{ $profileCard->content['hero_title_two'] ?? 'a dedicated' }} <span
+                        class="text-gradient">{{ $profileCard->content['hero_title_highlight'] ?? 'Fullstack Architect' }}</span>
+                    {{ $profileCard->content['hero_title_suffix'] ?? 'crafting resilient systems.' }}</h1>
+                <div class="hero-meta"><span class="dot-live"></span> {{ $profileCard->content['hero_meta'] ?? 'Available for Freelancing' }}</div>
                 <div class="hero-actions">
-                    <a href="{{ !empty($profile) && !empty($profile->cv) ? (str_starts_with($profile->cv, 'http') ? $profile->cv : asset($profile->cv)) : '#' }}"
+                    <a href="{{ !empty($profile) && !empty($profile->cv) ? (str_starts_with($profile->cv, 'https') ? $profile->cv : asset($profile->cv)) : '#' }}"
                         target="_blank" class="btn btn-primary">Download CV
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2.5" stroke-linecap="round">
@@ -29,7 +29,7 @@
                             <line x1="12" y1="15" x2="12" y2="3" />
                         </svg>
                     </a>
-                    <a href="/projects" class="btn">See Works</a>
+                    <a href="{{ route('projects') }}" class="btn">See Works</a>
                 </div>
             </div>
 
@@ -53,48 +53,6 @@
                 </div>
             </div>
 
-
-            @php
-                $enableExperiences = \App\Models\Settings::where('key', 'enable_experiences')->value('value') ?? '1';
-                $experiencesList =
-                    $enableExperiences === '1' ? \App\Models\Experience::where('is_active', true)->get() : collect();
-            @endphp
-
-            @if ($enableExperiences === '1' && $experiencesList->isNotEmpty())
-                <section style="margin: 40px 0;">
-                    <h2 style="font-size: 1.75rem; font-weight: 800; margin-bottom: 20px; color: var(--fg);">Work
-                        Experience & Career</h2>
-                    <div style="display: flex; flex-direction: column; gap: 16px;">
-                        @foreach ($experiencesList as $exp)
-                            <div
-                                style="background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px;">
-                                <div
-                                    style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
-                                    <div>
-                                        <h3 style="font-size: 1.1rem; font-weight: 700; margin: 0; color: var(--fg);">
-                                            {{ $exp->title }}</h3>
-                                        <div style="font-size: 0.9rem; color: var(--accent); font-weight: 600;">
-                                            {{ $exp->company }} <span style="color: var(--muted); font-weight: 400;">—
-                                                {{ $exp->location ?: 'Remote' }}</span></div>
-                                    </div>
-                                    <span
-                                        style="font-size: 0.8rem; font-weight: 700; padding: 4px 10px; border-radius: 12px; background: var(--accent-soft); color: var(--accent);">
-                                        {{ $exp->start_year }} -
-                                        {{ $exp->is_current ? 'Present' : ($exp->end_year ?: 'Present') }}
-                                    </span>
-                                </div>
-                                @if ($exp->description)
-                                    <p
-                                        style="font-size: 0.9rem; color: var(--muted); line-height: 1.6; margin: 8px 0 0;">
-                                        {{ $exp->description }}</p>
-                                @endif
-                            </div>
-                        @endforeach
-                    </div>
-                </section>
-            @endif
-
-            <x-github-card />
 
         </div>
 

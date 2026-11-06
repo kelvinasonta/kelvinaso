@@ -27,7 +27,7 @@
     </div>
     @endif
 
-    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap: 24px;">
 
         <!-- Left Column: Templates List & Placeholders -->
         <div style="display: flex; flex-direction: column; gap: 24px;">
@@ -66,6 +66,10 @@
                                         </td>
                                         <td style="padding: 16px 20px; text-align: right;">
                                             <div style="display: flex; gap: 8px; justify-content: flex-end; align-items: center;">
+                                                <a href="{{ route('emails.preview.admin', $template->id) }}" target="_blank" class="btn secondary sm" style="font-size: 0.75rem; padding: 4px 10px; display: inline-flex; align-items: center; gap: 4px;">
+                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                                    Preview
+                                                </a>
                                                 <a href="{{ route('emails.edit.admin', $template->id) }}" class="btn secondary sm" style="font-size: 0.75rem; padding: 4px 10px;">
                                                     Edit
                                                 </a>

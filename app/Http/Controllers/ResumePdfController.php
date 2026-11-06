@@ -15,7 +15,7 @@ class ResumePdfController extends Controller
     {
         $adminUser = User::where('role', 'admin')->first();
         $profile = $adminUser ? $adminUser->profile : new Profile();
-        $user = $adminUser ?? new User(['name' => 'Asonta Kelvin', 'email' => 'contact@keviloq.com']);
+        $user = $adminUser ?? new User(['name' => 'Asonta Kelvin', 'email' => 'contact@Portfolio.com']);
         $experiences = Experience::where('is_active', true)->get();
         $stacks = Stack::where('is_active', true)->get();
         $projects = Project::where('is_active', true)->take(6)->get();

@@ -1,28 +1,21 @@
-<x-main-layout :page="$page" :settings="$settings ?? ['site_name' => 'Portfolio']">
+<x-main-layout :page="$page">
 
     <main class="container" style="max-width:960px;">
         <div class="page-head">
-            <p class="eyebrow">Contact · Available Q1 2026</p>
-            <h1>Let's build something <span class="text-gradient">worth keeping</span>.</h1>
+            <p class="eyebrow">Contact · Available for new projects</p>
+            <h1>Need to ask any <span class="text-gradient">questions?</span></h1>
         </div>
 
-        <div style="display:grid; grid-template-columns:1fr; gap:1.5rem; margin-top:2rem;" class="contact-tiles">
-            <a href="mailto:{{ $email }}" class="card" style="padding:2rem;">
+        <div class="contact-tiles" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap:1.5rem; margin-top:1.5rem;">
+            <a href="mailto:{{ $email ?? '' }}" class="card" style="padding: clamp(1.5rem, 4vw, 2rem);">
                 <p class="eyebrow" style="color:var(--muted);">Email</p>
-                <p style="font-size:1.6rem; font-weight:600; margin-top:0.75rem;">{{ $email }} →</p>
+                <p style="font-size: clamp(1.2rem, 3vw, 1.6rem); font-weight:600; margin-top:0.75rem; word-break: break-all;">{{ $email ?? '' }} →</p>
             </a>
-            <a href="tel:{{ $phone }}" class="card" style="padding:2rem;">
+            <a href="tel:{{ $phone ?? '' }}" class="card" style="padding: clamp(1.5rem, 4vw, 2rem);">
                 <p class="eyebrow" style="color:var(--muted);">Schedule a call</p>
-                <p style="font-size:1.6rem; font-weight:600; margin-top:0.75rem;">Book 30 minutes →</p>
+                <p style="font-size: clamp(1.2rem, 3vw, 1.6rem); font-weight:600; margin-top:0.75rem;">Let's Talk →</p>
             </a>
         </div>
-        <style>
-            @media (min-width:700px) {
-                .contact-tiles {
-                    grid-template-columns: 1fr 1fr !important;
-                }
-            }
-        </style>
 
         <form id="contact-form" class="card form" novalidate style="margin-top:2.5rem;">
             <div>
@@ -60,19 +53,6 @@
                 <button type="submit" class="btn btn-primary">Send message</button>
             </div>
         </form>
-
-        <div class="card" style="margin-top:2.5rem; padding:2rem;">
-            <p class="eyebrow" style="color:var(--muted);">What I'm taking on</p>
-            <ul
-                style="list-style:none; padding:0; margin-top:1rem; display:flex; flex-direction:column; gap:0.75rem; font-size:1.05rem;">
-                <li><span style="color:var(--accent); margin-right:0.5rem;">✦</span> Laravel backend engagements (6–12
-                    weeks, embedded)</li>
-                <li><span style="color:var(--accent); margin-right:0.5rem;">✦</span> Analytics dashboards & reporting
-                    infrastructure</li>
-                <li><span style="color:var(--accent); margin-right:0.5rem;">✦</span> Data analysis projects, churn
-                    studies & cohort modelling</li>
-            </ul>
-        </div>
     </main>
 
 </x-main-layout>

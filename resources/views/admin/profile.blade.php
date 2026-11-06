@@ -1,4 +1,4 @@
-<x-admin-layout :page="$page" :profile="$profile" :settings="$settings ?? ['site_name' => 'Portfolio']">
+<x-admin-layout :page="$page" :profile="$profile">
 
     <div class="page-header">
         <div>
@@ -87,6 +87,8 @@
                                 placeholder="e.g. Crafting High-Performance Web Systems & Mobile Applications" />
                         </div>
 
+
+
                         <div class="field">
                             <div
                                 style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
@@ -98,6 +100,12 @@
                             </div>
                             <textarea class="textarea" id="bio" name="bio" rows="4"
                                 placeholder="Brief about me bio summary for portfolio profile cards...">{{ old('bio', $profile->bio) }}</textarea>
+                        </div>
+
+                        <div class="field">
+                            <label for="bio_extra">Bio Highlighted</label>
+                            <input class="input" id="bio_extra" name="bio_extra"
+                                value="{{ old('bio_extra', $profile->bio_extra) }}" placeholder="e.g. bio_extra" />
                         </div>
 
                         <div class="form-grid cols-3">

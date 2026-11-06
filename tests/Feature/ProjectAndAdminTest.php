@@ -27,16 +27,16 @@ class ProjectAndAdminTest extends TestCase
     {
         $response = $this->get('/projects');
         $response->assertStatus(200);
-        $response->assertSee('Keviloq Portfolio');
+        $response->assertSee('Portfolio Portfolio');
     }
 
     public function test_project_detail_page_renders_without_errors(): void
     {
-        $project = Project::where('slug', 'keviloq-portfolio')->first();
+        $project = Project::where('slug', 'Portfolio-portfolio')->first();
         $response = $this->get('/projects/' . $project->slug);
 
         $response->assertStatus(200);
-        $response->assertSee('Keviloq Portfolio');
+        $response->assertSee('Portfolio Portfolio');
         $response->assertSee('CEO');
         $response->assertSee('Sam Ergu');
     }
@@ -54,7 +54,7 @@ class ProjectAndAdminTest extends TestCase
         $response = $this->actingAs($this->adminUser)->get(route('projects.admin'));
         $response->assertStatus(200);
         $response->assertSee('Projects');
-        $response->assertSee('Keviloq Portfolio');
+        $response->assertSee('Portfolio Portfolio');
     }
 
     public function test_admin_can_create_project(): void

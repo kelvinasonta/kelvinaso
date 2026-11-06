@@ -1,4 +1,4 @@
-<x-admin-layout :page="$pages" :profile="$profile" :settings="$settings ?? ['site_name' => 'Portfolio']">
+<x-admin-layout :page="$pages" :profile="$profile">
 
 
     <div class="page-header">
@@ -6,7 +6,7 @@
             <h1>Content Pages</h1>
             <div class="sub">Manage the static pages on your portfolio.</div>
         </div>
-        <a class="btn" href="page-edit.html">
+        <a class="btn" href="{{ route('pages.create.admin') }}">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M12 5v14M5 12h14" />
             </svg>
@@ -37,10 +37,10 @@
                             <td>
                                 @if ($page->is_active)
                                     <span class="status-badge"
-                                            style="color:#16a34a;background:#dcfce7;padding:2px 8px;border-radius:12px;font-size:12px;font-weight:500;">Published</span>
+                                        style="color:#16a34a;background:#dcfce7;padding:2px 8px;border-radius:12px;font-size:12px;font-weight:500;">Published</span>
                                 @else
                                     <span class="status-badge"
-                                            style="color:#dc2626;background:#fee2e2;padding:2px 8px;border-radius:12px;font-size:12px;font-weight:500;">Draft</span>
+                                        style="color:#dc2626;background:#fee2e2;padding:2px 8px;border-radius:12px;font-size:12px;font-weight:500;">Draft</span>
                                 @endif
                             </td>
                             <td class="muted">{{ $page->updated_at ? $page->updated_at->diffForHumans() : '-' }}</td>

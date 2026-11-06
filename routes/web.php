@@ -7,19 +7,26 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\Admin\AdminProjectController;
+use App\Http\Middleware\TrackReferralCode;
+use App\Http\Controllers\BlogController;
+use App\Http\Controllers\UserDashboardController;
+use App\Http\Controllers\SnippetController;
+use App\Http\Controllers\BookCallController;
+use App\Http\Controllers\ResumePdfController;
+use App\Http\Controllers\AiChatbotController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['track.page.views', \App\Http\Middleware\TrackReferralCode::class])->group(function () {
+Route::middleware(['track.page.views', TrackReferralCode::class])->group(function () {
     Route::get('/', [HomeController::class, 'index'])->name('home');
     Route::get('/projects', [ProjectController::class, 'index'])->name('projects');
     Route::get('/projects/{slug}', [ProjectController::class, 'show'])->name('projects.show');
     Route::get('/about', [AboutController::class, 'index'])->name('about');
     Route::get('/contact', [ContactController::class, 'index'])->name('contact');
-    Route::get('/blog', [\App\Http\Controllers\BlogController::class, 'index'])->name('blog');
-    Route::get('/blog/{slug}', [\App\Http\Controllers\BlogController::class, 'show'])->name('blog.show');
+    Route::get('/blog', [BlogController::class, 'index'])->name('blog');
+    Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
 });
 
-Route::get('/dashboard', [\App\Http\Controllers\UserDashboardController::class, 'index'])->middleware(['auth'])->name('dashboard');
+Route::get('/dashboard', [UserDashboardController::class, 'index'])->middleware(['auth'])->name('dashboard');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -31,6 +38,8 @@ Route::prefix('/admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard.admin');
     Route::get('analytics', [\App\Http\Controllers\Admin\AdminAnalyticsController::class, 'index'])->name('analytics.admin');
     Route::get('pages', [PageController::class, 'index'])->name('pages.admin');
+    Route::get('pages/create', [PageController::class, 'create'])->name('pages.create.admin');
+    Route::post('pages', [PageController::class, 'store'])->name('pages.store.admin');
     Route::get('pages/{slug}', [PageController::class, 'show'])->name('pages.show');
     Route::patch('pages/{slug}', [PageController::class, 'update'])->name('pages.update');
 
@@ -79,6 +88,7 @@ Route::prefix('/admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('emails/{id}/edit', [\App\Http\Controllers\Admin\AdminEmailController::class, 'edit'])->name('emails.edit.admin');
     Route::patch('emails/{id}', [\App\Http\Controllers\Admin\AdminEmailController::class, 'update'])->name('emails.update.admin');
     Route::delete('emails/{id}', [\App\Http\Controllers\Admin\AdminEmailController::class, 'destroy'])->name('emails.destroy.admin');
+    Route::get('emails/{id}/preview', [\App\Http\Controllers\Admin\AdminEmailController::class, 'preview'])->name('emails.preview.admin');
     Route::post('emails/global', [\App\Http\Controllers\Admin\AdminEmailController::class, 'updateGlobal'])->name('emails.global.admin');
     Route::post('emails/test', [\App\Http\Controllers\Admin\AdminEmailController::class, 'sendTestEmail'])->name('emails.test.admin');
 
@@ -113,15 +123,22 @@ Route::prefix('/admin')->middleware(['auth', 'admin'])->group(function () {
     //Affiliates & Referrals
     Route::get('affiliates', [\App\Http\Controllers\Admin\AdminAffiliateController::class, 'index'])->name('affiliates.admin');
     Route::patch('affiliates/{id}', [\App\Http\Controllers\Admin\AdminAffiliateController::class, 'update'])->name('affiliates.update.admin');
+
+    //Database Backup
+    Route::get('backup', [\App\Http\Controllers\Admin\AdminBackupController::class, 'index'])->name('backup.admin');
+    Route::post('backup/create', [\App\Http\Controllers\Admin\AdminBackupController::class, 'create'])->name('backup.create.admin');
+    Route::get('backup/download/{filename}', [\App\Http\Controllers\Admin\AdminBackupController::class, 'download'])->name('backup.download.admin');
+    Route::delete('backup/{filename}', [\App\Http\Controllers\Admin\AdminBackupController::class, 'destroy'])->name('backup.destroy.admin');
+    Route::post('backup/restore/{filename}', [\App\Http\Controllers\Admin\AdminBackupController::class, 'restore'])->name('backup.restore.admin');
 });
 
 //Public Feature Modules
-Route::get('/snippets', [\App\Http\Controllers\SnippetController::class, 'index'])->name('snippets.index');
-Route::get('/snippet/{slug}', [\App\Http\Controllers\SnippetController::class, 'show'])->name('snippets.show');
-Route::get('/book-call', [\App\Http\Controllers\BookCallController::class, 'index'])->name('book-call');
-Route::get('/resume/pdf', [\App\Http\Controllers\ResumePdfController::class, 'download'])->name('resume.pdf');
-Route::get('/ai-assistant/history', [\App\Http\Controllers\AiChatbotController::class, 'history'])->name('ai-chatbot.history');
-Route::post('/ai-assistant/chat', [\App\Http\Controllers\AiChatbotController::class, 'chat'])->name('ai-chatbot.chat');
+Route::get('/snippets', [SnippetController::class, 'index'])->name('snippets.index');
+Route::get('/snippet/{slug}', [SnippetController::class, 'show'])->name('snippets.show');
+Route::get('/book-call', [BookCallController::class, 'index'])->name('book-call');
+Route::get('/resume/pdf', [ResumePdfController::class, 'download'])->name('resume.pdf');
+Route::get('/ai-assistant/history', [AiChatbotController::class, 'history'])->name('ai-chatbot.history');
+Route::post('/ai-assistant/chat', [AiChatbotController::class, 'chat'])->name('ai-chatbot.chat');
 
 
 require __DIR__.'/auth.php';

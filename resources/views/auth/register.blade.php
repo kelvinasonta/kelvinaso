@@ -1,6 +1,7 @@
 @php
     $ouths = [];
 @endphp
+
 <x-auth-layout>
 
     <div class="auth-card">
@@ -62,7 +63,7 @@
         <x-oauth-component :oAuth="$ouths" />
 
         <div class="auth-footer">
-            Already have an account? <a href="login.html">Sign in</a>
+            Already have an account? <a href="{{ route('login') }}">Sign in</a>
         </div>
     </div>
 

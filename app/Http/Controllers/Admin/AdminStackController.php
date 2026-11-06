@@ -50,6 +50,7 @@ class AdminStackController extends Controller
         $validated['is_lang'] = $request->has('is_lang');
         $validated['is_active'] = $request->has('is_active');
 
+        
         Stack::create($validated);
 
         return redirect()->route('stacks.admin')->with('success', 'Skill / Tech Stack added successfully.');

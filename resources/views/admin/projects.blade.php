@@ -1,4 +1,4 @@
-<x-admin-layout :page="$pages" :profile="$profile" :settings="$settings ?? ['site_name' => 'Portfolio']">
+<x-admin-layout :page="$pages" :profile="$profile">
 
     <div class="page-header">
         <div>
@@ -42,28 +42,37 @@
                                     <div class="thumb">{{ $project->initials }}</div>
                                     <div>
                                         <div style="font-weight:600">{{ $project->title }}</div>
-                                        <div class="muted" style="font-size:12px">{{ $project->short_description ?? '' }}</div>
+                                        <div class="muted" style="font-size:12px">
+                                            {{ $project->short_description ?? '' }}</div>
                                     </div>
                                 </div>
                             </td>
                             <td>{{ ucfirst($project->project_type) }}</td>
                             <td>
                                 @php
-                                    $stacks = is_array($project->tech_stack) ? $project->tech_stack : (array_filter(array_map('trim', explode(',', $project->tech_stack ?? ''))));
+                                    $stacks = is_array($project->tech_stack)
+                                        ? $project->tech_stack
+                                        : array_filter(array_map('trim', explode(',', $project->tech_stack ?? '')));
                                 @endphp
                                 @foreach (array_slice($stacks, 0, 3) as $stack)
                                     <span class="tech-chip">{{ $stack }}</span>
                                 @endforeach
                             </td>
-                            <td><span class="status-badge {{ $project->is_active ? 'success' : 'danger'}}">{{ $project->is_active ? 'Active' : 'Inactive'}}</span>
+                            <td><span
+                                    class="status-badge {{ $project->is_active ? 'success' : 'danger' }}">{{ $project->is_active ? 'Active' : 'Inactive' }}</span>
                             </td>
-                            <td class="muted">{{ $project->updated_at ? $project->updated_at->diffForHumans() : '-' }}</td>
+                            <td class="muted">{{ $project->updated_at ? $project->updated_at->diffForHumans() : '-' }}
+                            </td>
                             <td class="right">
-                                <a class="btn ghost sm" href="{{ route('projects.show.admin', $project->slug) }}">Edit</a>
-                                <form action="{{ route('projects.destroy.admin', $project->slug) }}" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete {{ $project->title }}?');">
+                                <a class="btn ghost sm"
+                                    href="{{ route('projects.show.admin', $project->slug) }}">Edit</a>
+                                <form action="{{ route('projects.destroy.admin', $project->slug) }}" method="POST"
+                                    style="display:inline;"
+                                    onsubmit="return confirm('Are you sure you want to delete {{ $project->title }}?');">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn ghost sm text-red" style="color:var(--c-danger);">Delete</button>
+                                    <button type="submit" class="btn ghost sm text-red"
+                                        style="color:var(--c-danger);">Delete</button>
                                 </form>
                             </td>
                         </tr>
@@ -79,4 +88,3 @@
 
 
 </x-admin-layout>
-

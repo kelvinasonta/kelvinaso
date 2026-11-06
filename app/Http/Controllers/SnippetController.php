@@ -16,7 +16,7 @@ class SnippetController extends Controller
             return redirect()->route('home');
         }
 
-        $page = Page::where('slug', 'home')->first();
+        $page = Page::where('slug', 'snippets')->first() ?? Page::where('slug', 'home')->first();
         $snippets = Snippet::where('is_active', true)->orderBy('created_at', 'desc')->paginate(9);
 
         return view('snippets', compact('page', 'snippets'));
@@ -29,7 +29,7 @@ class SnippetController extends Controller
             return redirect()->route('home');
         }
 
-        $page = Page::where('slug', 'home')->first();
+        $page = Page::where('slug', 'snippets')->first() ?? Page::where('slug', 'home')->first();
         $snippet = Snippet::where('slug', $slug)->where('is_active', true)->firstOrFail();
 
         return view('snippet_detail', compact('page', 'snippet'));

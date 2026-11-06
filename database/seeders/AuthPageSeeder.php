@@ -13,69 +13,77 @@ class AuthPageSeeder extends Seeder
      */
     public function run(): void
     {
-        $loginPage = Page::create([
-            'title' => 'Login',
-            'slug' => 'login',
-            'content' => [
-                'meta_description' => 'Login to your account',
-                'meta_keywords' => 'login, account, Keviloq Systems',
+        $loginPage = Page::updateOrCreate(
+            ['slug' => 'login'],
+            [
+                'title' => 'Login',
+                'content' => [
+                    'meta_description' => 'Login to your account',
+                    'meta_keywords' => 'login, account, Portfolio Systems',
+                ]
             ]
-        ]);
+        );
 
-        $loginPage->sections()->create([
-            'section_name' => 'auth_card',
-            'order' => 1,
-            'content' => [
-                'title' => 'Login to your account',
-                'subtitle' => 'Please enter your credentials to login.',                'button_text' => 'Login',
-                'forgot_password_text' => 'Forgot your password?',
-                'register_text' => "Don't have an account?",
+        $loginPage->sections()->updateOrCreate(
+            ['section_name' => 'auth_card'],
+            [
+                'order' => 1,
+                'content' => [
+                    'title' => 'Login to your account',
+                    'subtitle' => 'Please enter your credentials to login.',
+                    'button_text' => 'Login',
+                    'forgot_password_text' => 'Forgot your password?',
+                    'register_text' => "Don't have an account?",
+                ]
             ]
-        ]);
-    
+        );
 
-
-        $registerPage = Page::create([
-            'title' => 'Register',
-            'slug' => 'register',
-            'content' => [
-                'meta_description' => 'Create a new account',
-                'meta_keywords' => 'register, account, Keviloq Systems',
+        $registerPage = Page::updateOrCreate(
+            ['slug' => 'register'],
+            [
+                'title' => 'Register',
+                'content' => [
+                    'meta_description' => 'Create a new account',
+                    'meta_keywords' => 'register, account, Portfolio Systems',
+                ]
             ]
-        ]);
+        );
 
-        $registerPage->sections()->create([
-            'section_name' => 'auth_card',
-            'order' => 1,
-            'content' => [
-                'title' => 'Create a new account',
-                'subtitle' => 'Please fill in the details to create your account.',
-                'button_text' => 'Register',
-                'login_text' => "Already have an account?",
+        $registerPage->sections()->updateOrCreate(
+            ['section_name' => 'auth_card'],
+            [
+                'order' => 1,
+                'content' => [
+                    'title' => 'Create a new account',
+                    'subtitle' => 'Please fill in the details to create your account.',
+                    'button_text' => 'Register',
+                    'login_text' => "Already have an account?",
+                ]
             ]
-        ]);
+        );
 
-
-
-        $resetPage = Page::create([
-            'title' => 'Reset Password',
-            'slug' => 'reset-password',
-            'content' => [
-                'meta_description' => 'Reset your password',
-                'meta_keywords' => 'reset, password, Keviloq Systems',
+        $resetPage = Page::updateOrCreate(
+            ['slug' => 'reset-password'],
+            [
+                'title' => 'Reset Password',
+                'content' => [
+                    'meta_description' => 'Reset your password',
+                    'meta_keywords' => 'reset, password, Portfolio Systems',
+                ]
             ]
-        ]);
+        );
 
-        $resetPage->sections()->create([
-            'section_name' => 'auth_card',
-            'order' => 1,
-            'content' => [
-                'title' => 'Reset your password',
-                'subtitle' => 'Please enter your email address to reset your password.',
-                'button_text' => 'Reset Password',
-                'login_text' => "Already have an account?"
+        $resetPage->sections()->updateOrCreate(
+            ['section_name' => 'auth_card'],
+            [
+                'order' => 1,
+                'content' => [
+                    'title' => 'Reset your password',
+                    'subtitle' => 'Please enter your email address to reset your password.',
+                    'button_text' => 'Reset Password',
+                    'login_text' => "Already have an account?"
+                ]
             ]
-        ]);
+        );
     }
-
 }

@@ -18,29 +18,9 @@ class AdminEmailController extends Controller
         $page = Page::all();
         $profile = Auth::user()->profile;
 
-        // Auto-seed default templates if empty
-        if (EmailTemplate::count() === 0) {
-            EmailTemplate::create([
-                'slug' => 'contact_reply',
-                'subject' => 'Re: {{ subject }} - Reply from Keviloq Systems',
-                'body_html' => "<p>Hi {{ name }},</p>\n<p>Thank you for contacting us. Here is our response to your inquiry:</p>\n<blockquote style=\"border-left: 3px solid #10b981; padding-left: 12px; color: #555;\">{{ reply_message }}</blockquote>\n<p>Best regards,<br><strong>{{ sender_name }}</strong><br>Keviloq Systems</p>",
-                'is_active' => true,
-            ]);
-
-            EmailTemplate::create([
-                'slug' => 'visitor_welcome',
-                'subject' => 'Welcome to Keviloq Systems!',
-                'body_html' => "<p>Hello {{ name }},</p>\n<p>Thank you for reaching out! We received your message regarding <strong>{{ subject }}</strong> and our team will get back to you shortly.</p>\n<p>Warm regards,<br>Keviloq Systems Team</p>",
-                'is_active' => true,
-            ]);
-        }
 
         $templates = EmailTemplate::orderBy('created_at', 'desc')->get();
-        $emailSetting = EmailSetting::first() ?? EmailSetting::create([
-            'header_html' => '<div style="background-color: #0f1016; padding: 24px; text-align: center; border-radius: 8px 8px 0 0;"><h1 style="color: #6c8eff; margin: 0; font-family: sans-serif;">Keviloq Systems</h1></div>',
-            'footer_html' => '<div style="background-color: #f8fafc; padding: 18px; text-align: center; font-size: 12px; color: #64748b; border-radius: 0 0 8px 8px;"><p style="margin: 0;">© ' . date('Y') . ' Keviloq Systems. All rights reserved.</p></div>',
-        ]);
-
+        $emailSetting = EmailSetting::first() ?? [];
         return view('admin.emails', compact('page', 'profile', 'templates', 'emailSetting'));
     }
 
@@ -130,6 +110,36 @@ class AdminEmailController extends Controller
         return redirect()->back()->with('success', 'Global email header & footer updated successfully.');
     }
 
+    public function preview($id)
+    {
+        $template = EmailTemplate::findOrFail($id);
+        $emailSetting = EmailSetting::first();
+
+        $header = $emailSetting ? $emailSetting->header_html : '<div style="background-color: #0f1016; padding: 24px; text-align: center; border-radius: 8px 8px 0 0;"><h1 style="color: #6c8eff; margin: 0; font-family: sans-serif;">Portfolio Systems</h1></div>';
+        $footer = $emailSetting ? $emailSetting->footer_html : '<div style="background-color: #f8fafc; padding: 18px; text-align: center; font-size: 12px; color: #64748b; border-radius: 0 0 8px 8px;"><p style="margin: 0;">© ' . date('Y') . ' Portfolio Systems. All rights reserved.</p></div>';
+
+        // Sample data for preview placeholders
+        $sampleData = [
+            'name' => Auth::user()?->name ?? 'John Doe',
+            'email' => Auth::user()?->email ?? 'visitor@example.com',
+            'subject' => $template->subject ?: 'General Inquiry',
+            'reply_message' => 'Thank you for reaching out! We have received your inquiry and will be happy to work together on this project.',
+            'sender_name' => Auth::user()?->name ?? 'Kelvin Aso',
+            'body' => 'Thank you for contacting us. We will get back to you shortly.',
+        ];
+
+        $renderedSubject = $template->subject;
+        $renderedBody = $template->body_html;
+        foreach ($sampleData as $key => $val) {
+            $renderedSubject = str_replace(['{{ ' . $key . ' }}', '{{' . $key . '}}'], e($val), $renderedSubject);
+            $renderedBody = str_replace(['{{ ' . $key . ' }}', '{{' . $key . '}}'], $val, $renderedBody);
+        }
+
+        $fullHtml = $header . '<div style="background: #ffffff; color: #1e293b; padding: 32px 24px; font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif; font-size: 15px; line-height: 1.6;">' . $renderedBody . '</div>' . $footer;
+
+        return response($fullHtml, 200)->header('Content-Type', 'text/html; charset=UTF-8');
+    }
+
     public function sendTestEmail(Request $request)
     {
         $validated = $request->validate([
@@ -146,7 +156,7 @@ class AdminEmailController extends Controller
         try {
             Mail::html($fullHtml, function ($message) use ($validated) {
                 $message->to($validated['test_email'])
-                    ->subject('Test Email from Keviloq Systems Admin');
+                    ->subject('Test Email from Portfolio Systems Admin');
             });
 
             return redirect()->back()->with('success', 'Test email sent successfully to ' . $validated['test_email']);

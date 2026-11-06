@@ -53,16 +53,14 @@
 </head>
 
 <body>
-
- 
- 
+    <x-preloader />
 <div class="app">
 
   <x-admin-side-bar-component />
 
   <div class="main">
     <!-- Topbar -->
-    <x-admin-top-bar-component :fname="$profile->first_name" :lname="$profile->last_name" :email="$profile->direct_email"/>
+    <x-admin-top-bar-component :fname="$profile?->first_name ?? 'Admin'" :lname="$profile?->last_name ?? 'User'" :email="$profile?->direct_email ?? (auth()->user()?->email ?? 'admin@admin.com')"/>
 
     <!-- Content -->
     <main class="content animate-fade-in">

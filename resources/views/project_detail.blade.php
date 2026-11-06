@@ -1,4 +1,4 @@
-<x-main-layout :page="$page" :settings="$settings ?? ['site_name' => 'Portfolio']">
+<x-main-layout :page="$page">
 
 
     <section class="hero" style="position: relative;">
@@ -66,7 +66,7 @@
                     <p class="stack-title" style="margin-bottom: 1rem;">Technologies</p>
                     <div class="chips" style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
 
-                        @if(is_array($project->tech_stack))
+                        @if (is_array($project->tech_stack))
                             @foreach ($project->tech_stack as $tech)
                                 <span class="chip"
                                     style="flex: 1 1 auto; max-width: max-content; padding: 0.5rem 1rem;">{{ $tech }}</span>
@@ -83,7 +83,7 @@
 
 
 
-                @if ( $project->view_type === 'live')
+                @if ($project->view_type === 'live')
                     <a href="{{ $project->live_url }}" target="_blank" class="btn btn-primary"
                         style="margin-top: 2rem; width: 100%;">
                         View Live
@@ -121,7 +121,9 @@
             <div class="card stack animate-up delay-3" style="margin-top: 1.5rem; padding: 1rem;">
 
                 <div class="profile-img-wrap">
-                    <div class="profile-img"><img src="{{ str_starts_with($project->image, 'http') ? $project->image : asset($project->image) }}" alt="{{ $project->title }}" />
+                    <div class="profile-img"><img
+                            src="{{ str_starts_with($project->icon, 'https') ? $project->icon : asset($project->icon) }}"
+                            alt="{{ $project->title }}" />
                     </div>
 
                 </div>
@@ -132,12 +134,12 @@
                 <div class="card metrics animate-up delay-4 hero-card"
                     style="margin-top: 1.5rem; border-radius: var(--radius-xl);">
                     @foreach ($project->metrics as $key => $val)
-                        @if(is_array($val))
+                        @if (is_array($val))
                             @foreach ($val as $mKey => $mVal)
-                            <div>
-                                <p class="value">{{ is_scalar($mVal) ? $mVal : '' }}</p>
-                                <p class="label">{{ is_scalar($mKey) ? $mKey : '' }}</p>
-                            </div>
+                                <div>
+                                    <p class="value">{{ is_scalar($mVal) ? $mVal : '' }}</p>
+                                    <p class="label">{{ is_scalar($mKey) ? $mKey : '' }}</p>
+                                </div>
                             @endforeach
                         @elseif(is_scalar($val))
                             <div>
@@ -152,71 +154,91 @@
             @endif
 
             @if (is_array($project->other_details) && !empty($project->other_details))
-            <div class="card animate-up delay-4 hero-card" style="margin-top: 1.5rem; border-radius: var(--radius-xl);">
-                <div style="display: flex; flex-direction: column; gap: 3rem;">
-                  @foreach ( $project->other_details as $content)
-                    @php
-                      $isActive = $content['is_active'] ?? ($content['is_visible'] ?? true);
-                      $header = $content['header'] ?? ($content['title'] ?? ($content['content']['title'] ?? ''));
-                      $body = $content['paragrah'] ?? ($content['paragraph'] ?? ($content['body'] ?? ($content['content']['body'] ?? '')));
-                    @endphp
-                    @if ($isActive && ($header || $body))
-                      <div>
-                          @if($header)<h2 style="font-size: 1.75rem;">{{ $header }}</h2>@endif
-                          @if($body)<p style="color:var(--muted); font-size:1.1rem; line-height:1.7; margin-top:1rem;">
-                              {{ $body }}
-                          </p>@endif
-                      </div>
-                    @endif
-                  @endforeach
-                </div>
-            </div>
-            @endif
-
-            @if (!empty($project->client_comment) && is_array($project->client_comment) && !empty($project->client_comment['comment']))
-            @php
-                $commentName = $project->client_comment['name'] ?? '';
-                $commentWords = array_values(array_filter(explode(' ', trim($commentName))));
-                $commentInitials = count($commentWords) >= 2 
-                    ? strtoupper(substr($commentWords[0], 0, 1) . substr(end($commentWords), 0, 1))
-                    : (count($commentWords) === 1 ? strtoupper(substr($commentWords[0], 0, 2)) : 'CC');
-                $commentPosition = $project->client_comment['position'] ?? ($project->client_comment['poition'] ?? '');
-            @endphp
-            <div class="card animate-up delay-4"
-                style="margin-top: 1.5rem; padding: 2rem; border-left: 4px solid var(--accent); background: rgba(240, 86, 58, 0.03); border-radius: var(--radius-xl);">
-                <p style="font-size: 1.1rem; font-style: italic; line-height: 1.6; color: var(--fg);">"{{ $project->client_comment['comment'] }}"
-                </p>
-                <div style="display: flex; align-items: center; gap: 1rem; margin-top: 1.5rem;">
-                    <div
-                        style="width: 40px; height: 40px; border-radius: 50%; background: var(--border-strong); display: flex; align-items: center; justify-content: center; font-weight: 600; color: var(--muted); font-size: 0.8rem;">
-                        {{ $commentInitials }}</div>
-                    <div>
-                        <p style="font-weight: 600; font-size: 0.9rem; margin: 0;">{{ $commentName }}</p>
-                        <p style="color: var(--muted); font-size: 0.8rem; margin: 0;">{{ $commentPosition }}{{ $commentPosition && !empty($project->client) ? ', ' : '' }}{{ $project->client ?? '' }}
-                        </p>
+                <div class="card animate-up delay-4 hero-card"
+                    style="margin-top: 1.5rem; border-radius: var(--radius-xl);">
+                    <div style="display: flex; flex-direction: column; gap: 3rem;">
+                        @foreach ($project->other_details as $content)
+                            @php
+                                $isActive = $content['is_active'] ?? ($content['is_visible'] ?? true);
+                                $header =
+                                    $content['header'] ?? ($content['title'] ?? ($content['content']['title'] ?? ''));
+                                $body =
+                                    $content['paragrah'] ??
+                                    ($content['paragraph'] ??
+                                        ($content['body'] ?? ($content['content']['body'] ?? '')));
+                            @endphp
+                            @if ($isActive && ($header || $body))
+                                <div>
+                                    @if ($header)
+                                        <h2 style="font-size: 1.75rem;">{{ $header }}</h2>
+                                    @endif
+                                    @if ($body)
+                                        <p
+                                            style="color:var(--muted); font-size:1.1rem; line-height:1.7; margin-top:1rem;">
+                                            {{ $body }}
+                                        </p>
+                                    @endif
+                                </div>
+                            @endif
+                        @endforeach
                     </div>
                 </div>
-              </div>
             @endif
 
-            @if(!empty($nextProject['slug']))
-            <div class="animate-up delay-4" style="margin-top:4rem;">
-                <div class="card hero-card"
-                    style="display:flex; flex-direction:column; align-items:center; text-align:center; margin-bottom: 0; border-radius: var(--radius-xl);">
-                    <p class="eyebrow" style="color:var(--muted); margin-bottom: 0.75rem;">Up Next</p>
-                    <h2 style="font-size: 2rem; margin-bottom: 0.75rem;">{{ $nextProject['title'] }}</h2>
-                    <p style="color:var(--muted); font-size:1.05rem; margin-bottom: 1.5rem; max-width: 400px;">{{ $nextProject['short_description'] }}</p>
-                    <a href="{{ Route('projects.show', $nextProject['slug']) }}" class="btn btn-primary">
-                        Read Case Study
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                            style="margin-left: 0.25rem;">
-                            <line x1="5" y1="12" x2="19" y2="12"></line>
-                            <polyline points="12 5 19 12 12 19"></polyline>
-                        </svg>
-                    </a>
+            @if (
+                !empty($project->client_comment) &&
+                    is_array($project->client_comment) &&
+                    !empty($project->client_comment['comment']))
+                @php
+                    $commentName = $project->client_comment['name'] ?? '';
+                    $commentWords = array_values(array_filter(explode(' ', trim($commentName))));
+                    $commentInitials =
+                        count($commentWords) >= 2
+                            ? strtoupper(substr($commentWords[0], 0, 1) . substr(end($commentWords), 0, 1))
+                            : (count($commentWords) === 1
+                                ? strtoupper(substr($commentWords[0], 0, 2))
+                                : 'CC');
+                    $commentPosition =
+                        $project->client_comment['position'] ?? ($project->client_comment['poition'] ?? '');
+                @endphp
+                <div class="card animate-up delay-4"
+                    style="margin-top: 1.5rem; padding: 2rem; border-left: 4px solid var(--accent); background: rgba(240, 86, 58, 0.03); border-radius: var(--radius-xl);">
+                    <p style="font-size: 1.1rem; font-style: italic; line-height: 1.6; color: var(--fg);">
+                        "{{ $project->client_comment['comment'] }}"
+                    </p>
+                    <div style="display: flex; align-items: center; gap: 1rem; margin-top: 1.5rem;">
+                        <div
+                            style="width: 40px; height: 40px; border-radius: 50%; background: var(--border-strong); display: flex; align-items: center; justify-content: center; font-weight: 600; color: var(--muted); font-size: 0.8rem;">
+                            {{ $commentInitials }}</div>
+                        <div>
+                            <p style="font-weight: 600; font-size: 0.9rem; margin: 0;">{{ $commentName }}</p>
+                            <p style="color: var(--muted); font-size: 0.8rem; margin: 0;">
+                                {{ $commentPosition }}{{ $commentPosition && !empty($project->client) ? ', ' : '' }}{{ $project->client ?? '' }}
+                            </p>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            @endif
+
+            @if (!empty($nextProject['slug']))
+                <div class="animate-up delay-4" style="margin-top:4rem;">
+                    <div class="card hero-card"
+                        style="display:flex; flex-direction:column; align-items:center; text-align:center; margin-bottom: 0; border-radius: var(--radius-xl);">
+                        <p class="eyebrow" style="color:var(--muted); margin-bottom: 0.75rem;">Up Next</p>
+                        <h2 style="font-size: 2rem; margin-bottom: 0.75rem;">{{ $nextProject['title'] }}</h2>
+                        <p style="color:var(--muted); font-size:1.05rem; margin-bottom: 1.5rem; max-width: 400px;">
+                            {{ $nextProject['short_description'] }}</p>
+                        <a href="{{ Route('projects.show', $nextProject['slug']) }}" class="btn btn-primary">
+                            Read Case Study
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" style="margin-left: 0.25rem;">
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                                <polyline points="12 5 19 12 12 19"></polyline>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
             @endif
 
 
